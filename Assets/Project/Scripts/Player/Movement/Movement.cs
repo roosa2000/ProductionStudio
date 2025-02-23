@@ -2,17 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Movement : MonoBehaviour
+public class Movement : InputHandler
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public float moveSpeed = 5f;
+    //public CharacterController CharacterController;
 
-    // Update is called once per frame
-    void Update()
+    public override void ProcessMovement(float horizontal, float vertical)
     {
-        
+        Vector3 movement = new Vector3(horizontal, 0, vertical);
+
+        // Move the player
+        transform.Translate(movement * moveSpeed * Time.deltaTime, Space.World);
+        //CharacterController.
+
     }
 }
