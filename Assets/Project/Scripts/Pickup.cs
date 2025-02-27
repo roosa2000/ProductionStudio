@@ -12,6 +12,10 @@ public class Pickup : MonoBehaviour
             counter++;
             UpdateCounterUI();
             Destroy(other.gameObject); // Destroy the pickup item
+            if (counter == 3)
+            {
+                PathHighlighter.Instance.ShowExitPath();
+            }
         }
     }
 
