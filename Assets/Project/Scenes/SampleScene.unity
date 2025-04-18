@@ -362,7 +362,7 @@ GameObject:
   - component: {fileID: 414801600}
   - component: {fileID: 414801599}
   - component: {fileID: 414801598}
-  - component: {fileID: 414801597}
+  - component: {fileID: 414801602}
   m_Layer: 0
   m_Name: Warewolfs
   m_TagString: Untagged
@@ -370,19 +370,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &414801597
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 414801596}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b4e47ceee2acd4cc1a5cf785c3e91ed4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  config: {fileID: 11400000, guid: c98a74d1f730e407e9ab0cfcd78e0eda, type: 2}
 --- !u!136 &414801598
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -471,6 +458,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &414801602
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 414801596}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7cccd9e7aa544e8a708a8ecad768d39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  config: {fileID: 11400000, guid: d3f4ef84431a64878b95d5dd9e05fedc, type: 2}
+  player: {fileID: 2009751723}
 --- !u!1001 &430484812
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1298,7 +1299,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 851956985}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 855b50cd46a4544958a7d662bf961436, type: 3}
   m_Name: 
