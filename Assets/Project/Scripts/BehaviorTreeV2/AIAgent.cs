@@ -151,7 +151,7 @@ namespace Project.Scripts.BehaviorTreeV2
                             agent.SetDestination(roamTarget);
                             isRoaming = true;
                             roamTimer = 0f;
-                            Debug.DrawLine(transform.position, roamTarget, Color.cyan, 2f); // Just for debug
+                            Debug.DrawLine(transform.position, roamTarget, Color.green, 2f); // Just for debug
                         }
                     }
                     else if (isRoaming)
