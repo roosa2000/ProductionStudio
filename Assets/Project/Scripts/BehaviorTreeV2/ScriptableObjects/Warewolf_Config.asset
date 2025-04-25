@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db64ec61ea9c490c92e06dbb09c8a615, type: 3}
   m_Name: Warewolf_Config
   m_EditorClassIdentifier: 
-  DetectionRange: 15
-  AttackRange: 10
+  DetectionRange: 5
+  AttackRange: 2
   Damage: 5
   CanRoam: 1

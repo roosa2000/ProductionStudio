@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Project.Scripts.BehaviorTreeV2.ScriptableObjects;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace Project.Scripts.BehaviorTreeV2
 {
@@ -13,6 +14,14 @@ namespace Project.Scripts.BehaviorTreeV2
         [SerializeField] private Transform player;
 
         private BTNode currentRunningNode;
+        
+        [SerializeField] private float roamRadius = 10f;
+        [SerializeField] private float roamCooldown = 2f; // Time to wait before choosing next point
+
+        private float roamTimer;
+        private bool isRoaming = false;
+        private Vector3 roamTarget;
+        private NavMeshAgent agent;
 
         private void Start()
         {
@@ -20,7 +29,7 @@ namespace Project.Scripts.BehaviorTreeV2
             memory.SetTransform("Player", player);
             memory.SetFloat("Health", 100f);
             memory.SetBool("IsPlayerDetected", false);
-
+            agent = GetComponent<NavMeshAgent>();
             root = BuildBehaviorTree();
         }
 
@@ -98,10 +107,18 @@ namespace Project.Scripts.BehaviorTreeV2
             var chaseAction = new ActionNode(() => {
                 Debug.Log("Chasing player");
 
-                if (Vector3.Distance(transform.position, memory.GetTransform("Player").position) <= config.AttackRange)
+                Transform playerTransform = memory.GetTransform("Player");
+
+                float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
+
+                if (distanceToPlayer <= config.AttackRange)
                     return BTStatus.Success;
 
-                // NavMeshAgent.SetDestination(player.position) or equivalent...
+                if (agent != null)
+                    agent.SetDestination(playerTransform.position);
+
+                Debug.DrawLine(transform.position, playerTransform.position, Color.red); // Visual line during chase
+
                 return BTStatus.Running;
             });
 
@@ -119,6 +136,31 @@ namespace Project.Scripts.BehaviorTreeV2
             var patrolCondition = new ConditionNode(() => config.CanRoam);
             var patrolAction = new ActionNode(() => {
                 Debug.Log("Patrolling");
+                roamTimer += Time.deltaTime;
+
+                if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
+                {
+                    if (!isRoaming && roamTimer >= roamCooldown)
+                    {
+                        Vector3 randomDirection = Random.insideUnitSphere * roamRadius;
+                        randomDirection += transform.position;
+
+                        if (NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, roamRadius, NavMesh.AllAreas))
+                        {
+                            roamTarget = hit.position;
+                            agent.SetDestination(roamTarget);
+                            isRoaming = true;
+                            roamTimer = 0f;
+                            Debug.DrawLine(transform.position, roamTarget, Color.cyan, 2f); // Just for debug
+                        }
+                    }
+                    else if (isRoaming)
+                    {
+                        // Reached target
+                        isRoaming = false;
+                    }
+                }
+
                 return BTStatus.Running;
             });
 
@@ -135,5 +177,18 @@ namespace Project.Scripts.BehaviorTreeV2
                 roamingSelector
             });
         }
+        
+        private void OnDrawGizmosSelected()
+        {
+            if (config == null) return;
+
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(transform.position, config.DetectionRange);
+
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(transform.position, config.AttackRange);
+        }
     }
+    
+    
 }
