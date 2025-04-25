@@ -22,6 +22,13 @@ namespace Project.Scripts.BehaviorTreeV2
         private bool isRoaming = false;
         private Vector3 roamTarget;
         private NavMeshAgent agent;
+        
+        float stuckTimer = 0f;
+        float maxStuckTime = 5f;
+
+        bool isPaused = false;
+        float pauseTimer = 0f;
+        float pauseDuration = 2f; // Pause for 2 seconds between destinations
 
         private void Start()
         {
@@ -138,26 +145,61 @@ namespace Project.Scripts.BehaviorTreeV2
                 Debug.Log("Patrolling");
                 roamTimer += Time.deltaTime;
 
-                if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
+                // Handle pause between destinations
+                if (isPaused)
                 {
-                    if (!isRoaming && roamTimer >= roamCooldown)
+                    pauseTimer += Time.deltaTime;
+                    if (pauseTimer >= pauseDuration)
                     {
-                        Vector3 randomDirection = Random.insideUnitSphere * roamRadius;
-                        randomDirection += transform.position;
+                        isPaused = false;
+                        pauseTimer = 0f;
+                        roamTimer = roamCooldown; // Trigger new roam point after pause
+                    }
 
-                        if (NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, roamRadius, NavMesh.AllAreas))
+                    return BTStatus.Running;
+                }
+
+                if (!agent.pathPending &&
+                    agent.hasPath &&
+                    agent.pathStatus == NavMeshPathStatus.PathComplete)
+                {
+                    if (agent.remainingDistance <= agent.stoppingDistance)
+                    {
+                        stuckTimer = 0f;
+
+                        if (!isRoaming && roamTimer >= roamCooldown)
                         {
-                            roamTarget = hit.position;
-                            agent.SetDestination(roamTarget);
-                            isRoaming = true;
-                            roamTimer = 0f;
-                            Debug.DrawLine(transform.position, roamTarget, Color.green, 2f); // Just for debug
+                            Vector3 randomDirection = Random.insideUnitSphere * roamRadius;
+                            randomDirection += transform.position;
+
+                            if (NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, roamRadius, NavMesh.AllAreas))
+                            {
+                                roamTarget = hit.position;
+                                agent.SetDestination(roamTarget);
+                                isRoaming = true;
+                                roamTimer = 0f;
+                                Debug.DrawLine(transform.position, roamTarget, Color.green, 2f);
+                            }
+                        }
+                        else if (isRoaming)
+                        {
+                            // Reached target
+                            isRoaming = false;
+                            isPaused = true; // Trigger idle pause before next destination
                         }
                     }
-                    else if (isRoaming)
+                    else
                     {
-                        // Reached target
-                        isRoaming = false;
+                        stuckTimer += Time.deltaTime;
+
+                        if (stuckTimer >= maxStuckTime)
+                        {
+                            Debug.LogWarning("Agent might be stuck. Picking a new roam target.");
+                            isRoaming = false;
+                            isPaused = false;
+                            roamTimer = roamCooldown;
+                            stuckTimer = 0f;
+                        }
                     }
                 }
 
