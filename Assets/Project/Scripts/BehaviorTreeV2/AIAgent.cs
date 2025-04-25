@@ -160,46 +160,43 @@ namespace Project.Scripts.BehaviorTreeV2
                 }
 
                 if (!agent.pathPending &&
-                    agent.hasPath &&
-                    agent.pathStatus == NavMeshPathStatus.PathComplete)
+                    (agent.remainingDistance <= agent.stoppingDistance) &&
+                    (!agent.hasPath || agent.pathStatus == NavMeshPathStatus.PathComplete))
                 {
-                    if (agent.remainingDistance <= agent.stoppingDistance)
+                    stuckTimer = 0f;
+
+                    if (!isRoaming && roamTimer >= roamCooldown)
                     {
-                        stuckTimer = 0f;
+                        Vector3 randomDirection = Random.insideUnitSphere * roamRadius;
+                        randomDirection += transform.position;
 
-                        if (!isRoaming && roamTimer >= roamCooldown)
+                        if (NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, roamRadius, NavMesh.AllAreas))
                         {
-                            Vector3 randomDirection = Random.insideUnitSphere * roamRadius;
-                            randomDirection += transform.position;
-
-                            if (NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, roamRadius, NavMesh.AllAreas))
-                            {
-                                roamTarget = hit.position;
-                                agent.SetDestination(roamTarget);
-                                isRoaming = true;
-                                roamTimer = 0f;
-                                Debug.DrawLine(transform.position, roamTarget, Color.green, 2f);
-                            }
-                        }
-                        else if (isRoaming)
-                        {
-                            // Reached target
-                            isRoaming = false;
-                            isPaused = true; // Trigger idle pause before next destination
+                            roamTarget = hit.position;
+                            agent.SetDestination(roamTarget);
+                            isRoaming = true;
+                            roamTimer = 0f;
+                            Debug.DrawLine(transform.position, roamTarget, Color.green, 2f);
                         }
                     }
-                    else
+                    else if (isRoaming)
                     {
-                        stuckTimer += Time.deltaTime;
+                        // Reached target
+                        isRoaming = false;
+                        isPaused = true; // Trigger idle pause before next destination
+                    }
+                }
+                else
+                {
+                    stuckTimer += Time.deltaTime;
 
-                        if (stuckTimer >= maxStuckTime)
-                        {
-                            Debug.LogWarning("Agent might be stuck. Picking a new roam target.");
-                            isRoaming = false;
-                            isPaused = false;
-                            roamTimer = roamCooldown;
-                            stuckTimer = 0f;
-                        }
+                    if (stuckTimer >= maxStuckTime)
+                    {
+                        Debug.LogWarning("Agent might be stuck. Picking a new roam target.");
+                        isRoaming = false;
+                        isPaused = false;
+                        roamTimer = roamCooldown;
+                        stuckTimer = 0f;
                     }
                 }
 
