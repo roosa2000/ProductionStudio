@@ -29,6 +29,8 @@ namespace Project.Scripts.BehaviorTreeV2
         bool isPaused = false;
         float pauseTimer = 0f;
         float pauseDuration = 2f; // Pause for 2 seconds between destinations
+        
+        private Animator animator;
 
         private void Start()
         {
@@ -38,10 +40,12 @@ namespace Project.Scripts.BehaviorTreeV2
             memory.SetBool("IsPlayerDetected", false);
             agent = GetComponent<NavMeshAgent>();
             root = BuildBehaviorTree();
+            animator = GetComponent<Animator>();
         }
 
         private void Update()
         {
+            animator.SetFloat("Speed", agent.velocity.magnitude);
             if (currentRunningNode != null)
             {
                 var status = currentRunningNode.Evaluate();
