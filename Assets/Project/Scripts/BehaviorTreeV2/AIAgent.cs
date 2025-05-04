@@ -31,6 +31,7 @@ namespace Project.Scripts.BehaviorTreeV2
         float pauseDuration = 2f; // Pause for 2 seconds between destinations
         
         private Animator animator;
+        private BoxCollider boxCollider;
 
         private void Start()
         {
@@ -41,6 +42,7 @@ namespace Project.Scripts.BehaviorTreeV2
             agent = GetComponent<NavMeshAgent>();
             root = BuildBehaviorTree();
             animator = GetComponent<Animator>();
+            boxCollider = GetComponentInChildren<BoxCollider>();
         }
 
         private void Update()
@@ -232,6 +234,15 @@ namespace Project.Scripts.BehaviorTreeV2
                 agent.SetDestination(playerTransform.position);
 
             Debug.DrawLine(transform.position, playerTransform.position, Color.red); // Visual line during chase
+        }
+
+        private void OnTriggerEnter(Collider collider)
+        {
+            var player = collider.CompareTag("Player");
+            if (player)
+            {
+                Debug.Log("Player Hit");
+            }
         }
 
         private void OnDrawGizmosSelected()
