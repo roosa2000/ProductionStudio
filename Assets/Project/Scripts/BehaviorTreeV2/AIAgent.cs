@@ -46,6 +46,7 @@ namespace Project.Scripts.BehaviorTreeV2
         private void Update()
         {
             animator.SetFloat("Speed", agent.velocity.magnitude);
+            Debug.Log("speed="+ agent.velocity.magnitude);
             if (currentRunningNode != null)
             {
                 var status = currentRunningNode.Evaluate();
@@ -92,6 +93,7 @@ namespace Project.Scripts.BehaviorTreeV2
 
             var attackAction = new ActionNode(() => {
                 Debug.Log("Attacking player");
+                animator.SetTrigger("Attack");
 
                 if (Vector3.Distance(transform.position, memory.GetTransform("Player").position) > config.AttackRange)
                     return BTStatus.Success;
@@ -118,17 +120,7 @@ namespace Project.Scripts.BehaviorTreeV2
             var chaseAction = new ActionNode(() => {
                 Debug.Log("Chasing player");
 
-                Transform playerTransform = memory.GetTransform("Player");
-
-                float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
-
-                if (distanceToPlayer <= config.AttackRange)
-                    return BTStatus.Success;
-
-                if (agent != null)
-                    agent.SetDestination(playerTransform.position);
-
-                Debug.DrawLine(transform.position, playerTransform.position, Color.red); // Visual line during chase
+                ChasePlayer();
 
                 return BTStatus.Running;
             });
@@ -147,62 +139,7 @@ namespace Project.Scripts.BehaviorTreeV2
             var patrolCondition = new ConditionNode(() => config.CanRoam);
             var patrolAction = new ActionNode(() => {
                 Debug.Log("Patrolling");
-                roamTimer += Time.deltaTime;
-
-                // Handle pause between destinations
-                if (isPaused)
-                {
-                    pauseTimer += Time.deltaTime;
-                    if (pauseTimer >= pauseDuration)
-                    {
-                        isPaused = false;
-                        pauseTimer = 0f;
-                        roamTimer = roamCooldown; // Trigger new roam point after pause
-                    }
-
-                    return BTStatus.Running;
-                }
-
-                if (!agent.pathPending &&
-                    (agent.remainingDistance <= agent.stoppingDistance) &&
-                    (!agent.hasPath || agent.pathStatus == NavMeshPathStatus.PathComplete))
-                {
-                    stuckTimer = 0f;
-
-                    if (!isRoaming && roamTimer >= roamCooldown)
-                    {
-                        Vector3 randomDirection = Random.insideUnitSphere * roamRadius;
-                        randomDirection += transform.position;
-
-                        if (NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, roamRadius, NavMesh.AllAreas))
-                        {
-                            roamTarget = hit.position;
-                            agent.SetDestination(roamTarget);
-                            isRoaming = true;
-                            roamTimer = 0f;
-                            Debug.DrawLine(transform.position, roamTarget, Color.green, 2f);
-                        }
-                    }
-                    else if (isRoaming)
-                    {
-                        // Reached target
-                        isRoaming = false;
-                        isPaused = true; // Trigger idle pause before next destination
-                    }
-                }
-                else
-                {
-                    stuckTimer += Time.deltaTime;
-
-                    if (stuckTimer >= maxStuckTime)
-                    {
-                        Debug.LogWarning("Agent might be stuck. Picking a new roam target.");
-                        isRoaming = false;
-                        isPaused = false;
-                        roamTimer = roamCooldown;
-                        stuckTimer = 0f;
-                    }
-                }
+                Roam();
 
                 return BTStatus.Running;
             });
@@ -220,7 +157,83 @@ namespace Project.Scripts.BehaviorTreeV2
                 roamingSelector
             });
         }
-        
+
+        private BTStatus Roam()
+        {
+            roamTimer += Time.deltaTime;
+
+            // Handle pause between destinations
+            if (isPaused)
+            {
+                pauseTimer += Time.deltaTime;
+                if (pauseTimer >= pauseDuration)
+                {
+                    isPaused = false;
+                    pauseTimer = 0f;
+                    roamTimer = roamCooldown; // Trigger new roam point after pause
+                }
+
+                return BTStatus.Running;
+            }
+
+            if (!agent.pathPending &&
+                (agent.remainingDistance <= agent.stoppingDistance) &&
+                (!agent.hasPath || agent.pathStatus == NavMeshPathStatus.PathComplete))
+            {
+                stuckTimer = 0f;
+
+                if (!isRoaming && roamTimer >= roamCooldown)
+                {
+                    Vector3 randomDirection = Random.insideUnitSphere * roamRadius;
+                    randomDirection += transform.position;
+
+                    if (NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, roamRadius, NavMesh.AllAreas))
+                    {
+                        roamTarget = hit.position;
+                        agent.SetDestination(roamTarget);
+                        isRoaming = true;
+                        roamTimer = 0f;
+                        Debug.DrawLine(transform.position, roamTarget, Color.green, 2f);
+                    }
+                }
+                else if (isRoaming)
+                {
+                    // Reached target
+                    isRoaming = false;
+                    isPaused = true; // Trigger idle pause before next destination
+                }
+            }
+            else
+            {
+                stuckTimer += Time.deltaTime;
+
+                if (stuckTimer >= maxStuckTime)
+                {
+                    Debug.LogWarning("Agent might be stuck. Picking a new roam target.");
+                    isRoaming = false;
+                    isPaused = false;
+                    roamTimer = roamCooldown;
+                    stuckTimer = 0f;
+                }
+            }
+            return BTStatus.Running;
+        }
+
+        private void ChasePlayer()
+        {
+            Transform playerTransform = memory.GetTransform("Player");
+
+            float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
+
+            if (distanceToPlayer <= config.AttackRange)
+                return;
+
+            if (agent != null)
+                agent.SetDestination(playerTransform.position);
+
+            Debug.DrawLine(transform.position, playerTransform.position, Color.red); // Visual line during chase
+        }
+
         private void OnDrawGizmosSelected()
         {
             if (config == null) return;
