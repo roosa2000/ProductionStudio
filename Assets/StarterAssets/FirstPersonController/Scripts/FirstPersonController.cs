@@ -14,6 +14,7 @@ namespace StarterAssets
 		[Header("Player")]
 		[Tooltip("Move speed of the character in m/s")]
 		public float MoveSpeed = 4.0f;
+		private float _speedMultiplier = 1f;
 		[Tooltip("Sprint speed of the character in m/s")]
 		public float SprintSpeed = 6.0f;
 		[Tooltip("Rotation speed of the character")]
@@ -154,8 +155,9 @@ namespace StarterAssets
 		private void Move()
 		{
 			// set target speed based on move speed, sprint speed and if sprint is pressed
-			float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
-
+			//float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
+			float targetSpeed = (_input.sprint ? SprintSpeed : MoveSpeed) * _speedMultiplier;
+			Debug.Log("Current speed ="+targetSpeed);
 			// a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
 
 			// note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
@@ -196,6 +198,11 @@ namespace StarterAssets
 
 			// move the player
 			_controller.Move(inputDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+		}
+		
+		public void SetSpeedMultiplier(float multiplier)
+		{
+			_speedMultiplier = multiplier;
 		}
 
 		private void JumpAndGravity()

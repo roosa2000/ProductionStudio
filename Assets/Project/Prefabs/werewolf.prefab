@@ -411,7 +411,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   config: {fileID: 11400000, guid: d3f4ef84431a64878b95d5dd9e05fedc, type: 2}
-  player: {fileID: 0}
+  player: {fileID: 5308083679333888154, guid: 2b1cb78a749194a6b80c85a4d4c5e8ad, type: 3}
   roamRadius: 10
   roamCooldown: 2
 --- !u!136 &6068236820890286417
