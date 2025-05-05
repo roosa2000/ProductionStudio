@@ -10,6 +10,7 @@ public class KillEnemy : MonoBehaviour
 
     private bool hasAbility = false;
     private KeyCode executeKey = KeyCode.E;
+    [SerializeField] private KillAbilityUI abilityUI;
     
     private void Update()
     {
@@ -17,6 +18,7 @@ public class KillEnemy : MonoBehaviour
         {
             ExecuteEnemiesInRange();
             hasAbility = false; // Burn it after use
+            abilityUI.HideIcon();
         }
     }
     
@@ -38,6 +40,7 @@ public class KillEnemy : MonoBehaviour
     public void GrantAbility()
     {
         hasAbility = true;
+        abilityUI.ShowIcon();
         Debug.Log("Execute ability granted!");
     }
 
