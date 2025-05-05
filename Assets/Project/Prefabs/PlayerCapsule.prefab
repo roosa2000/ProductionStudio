@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4404598761071916972}
   - component: {fileID: 4715723637174275033}
   - component: {fileID: 218744364145252685}
-  - component: {fileID: 6065877136766401281}
+  - component: {fileID: 9151739214911774906}
   m_Layer: 7
   m_Name: PlayerCapsule
   m_TagString: Player
@@ -30,7 +30,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4214851243764141107}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -67.6, y: 0, z: -68.1}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
@@ -228,7 +228,7 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
---- !u!114 &6065877136766401281
+--- !u!114 &9151739214911774906
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -237,10 +237,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 4214851243764141107}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2882d52cee6534bc2bf4d7ee0e45a7a2, type: 3}
+  m_Script: {fileID: 11500000, guid: cff985fc16180424e85613cb3ab7dabf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  counter: 0
+  executeRange: 5
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  abilityUI: {fileID: 0}
 --- !u!1 &6794380219548349242
 GameObject:
   m_ObjectHideFlags: 0

@@ -10,7 +10,7 @@ public class Heal : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             HealthSystem.Instance.Heal(healAmount);
-            Destroy(other.gameObject);
+            Destroy(gameObject);
         }
     }
 }
