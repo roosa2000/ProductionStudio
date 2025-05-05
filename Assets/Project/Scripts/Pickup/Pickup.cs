@@ -27,6 +27,7 @@ public class Pickup : MonoBehaviour
             {
                 pickupImages[counter].color = activeColor;
                 counter++;
+                PickupManager.Instance.RegisterPickup();
             }
             Destroy(gameObject); // Destroy the pickup item
             if (counter == 3)
@@ -36,8 +37,8 @@ public class Pickup : MonoBehaviour
         }
     }
 
-    private void UpdateSlotUI()
-    {
-        Debug.Log("Pickups: " + counter);
-    }
+    // public bool HasCollectedAll()
+    // {
+    //     return counter == 3;
+    // }
 }
