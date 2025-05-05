@@ -242,6 +242,7 @@ namespace Project.Scripts.BehaviorTreeV2
             if (player)
             {
                 Debug.Log("Player Hit");
+                HealthSystem.Instance.Damage(5);
             }
         }
 
